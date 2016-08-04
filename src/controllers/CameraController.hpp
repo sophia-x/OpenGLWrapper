@@ -9,7 +9,10 @@ using namespace glm;
 class CameraController {
 public:
 	CameraController(GLFWwindow *p_window, vec3 p_position, float p_horizontal_angle, float p_vertical_angle, float p_fov):
-		window{p_window}, position{p_position}, horizontal_angle{p_horizontal_angle}, vertical_angle(p_vertical_angle), fov(p_fov) {}
+		window{p_window}, position{p_position}, horizontal_angle{p_horizontal_angle}, vertical_angle(p_vertical_angle), fov(p_fov)
+	{
+		
+	}
 	virtual ~CameraController() {}
 
 	virtual void control(float delta) = 0;

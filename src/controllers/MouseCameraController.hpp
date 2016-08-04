@@ -1,7 +1,12 @@
 #ifndef MOUSE_CAMERA_CONTROLLER
 #define MOUSE_CAMERA_CONTROLLER
 
+#include <functional>
+using namespace std;
+
+#include <tools/CallBackHelper.hpp>
 #include "CameraController.hpp"
+
 
 class MouseCameraController: public CameraController {
 public:
@@ -11,6 +16,8 @@ public:
 	{
 		// Hide the mouse and enable unlimited mouvement
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetScrollCallback(window, scrollCallBack);
+		scrolled[(unsigned long)this] = false;
 	}
 
 	void control(float delta);

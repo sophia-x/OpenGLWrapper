@@ -46,6 +46,11 @@ void MouseCameraController::control(float delta) {
 		position -= right * delta * speed;
 	}
 
+	if (scrolled[(unsigned long)this] && scroll_window == window) {
+		fov -= 0.3 * scroll_y;
+		scrolled[(unsigned long)this] = false;
+	}
+
 	projection_matrix = glm::perspective(glm::radians(fov), 4.0f / 3.0f, 0.1f, 100.0f);
 	// Camera matrix
 	view_matrix       = glm::lookAt(

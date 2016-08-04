@@ -58,7 +58,6 @@ void particle_demo() {
 			addRandomParticles(num, *particle_model_ptr);
 		}
 
-		particle_model_ptr->update(delta);
-		particle_model_ptr->draw();
+		world->update_draw(delta);
 	}
 }

@@ -23,6 +23,14 @@ public:
 		return *shaders[name];
 	}
 
+	inline void update_draw(double delta){
+		for(auto it = models.begin(); it!=models.end(); ++it){
+			Model &model = *(it->second);
+			model.update(delta);
+			model.draw();
+		}
+	}
+
 private:
 	map<string, unique_ptr<Model> > models;
 	map<string, unique_ptr<Shader> > shaders;

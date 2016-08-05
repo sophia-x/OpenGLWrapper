@@ -25,4 +25,3 @@ void main() {
 	uv = vertices.xy + vec2(0.5, 0.5);
 	particle_color = color;
 }
-

@@ -4,6 +4,18 @@
 
 #include "ParticleModel.hpp"
 
+static const string PARTICLE_SHADER_NAME = "Particle_Shader";
+
+void init_particle_shader(World *world) {
+	vector<string> names {
+		"camera_right_worldspace",
+		"camera_up_worldspace",
+		"vp",
+		"texture_in"
+	};
+	world->addShader(PARTICLE_SHADER_NAME, new Shader("shaders/Particle.vertexshader", "shaders/Particle.fragmentshader", names));
+}
+
 ParticleModel::ParticleModel(size_t p_max_num): MAX_NUM{p_max_num}, MAX_POS_SIZE{p_max_num * 4 * sizeof(GLfloat)},
 	MAX_COLOR_SIZE(p_max_num * 4 * sizeof(GLubyte)), particles(0), g_particule_position_size_data(p_max_num * 4),
 	particle_ptrs(p_max_num) , g_particule_color_data(p_max_num * 4) {
@@ -91,7 +103,7 @@ void ParticleModel::draw() {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		{
-			const Shader &shader = WindowManager::getWindowManager().getCurrentWorld().getShader("Particle");
+			const Shader &shader = WindowManager::getWindowManager().getCurrentWorld().getShader(PARTICLE_SHADER_NAME);
 			glUseProgram(shader.getID());
 			// Bind texture in Texture Unit 0
 			glActiveTexture(GL_TEXTURE0);

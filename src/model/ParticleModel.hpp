@@ -75,5 +75,6 @@ private:
 };
 
 void addRandomParticles(size_t num, ParticleModel &model);
+void init_particle_shader(World *world);
 
 #endif

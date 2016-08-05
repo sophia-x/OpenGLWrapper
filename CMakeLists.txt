@@ -18,6 +18,8 @@ find_library(COCOA Cocoa)
 find_library(COREVIDEO CoreVideo)
 find_library(GLEW glew)
 find_library(OPENGL OpenGL)
+find_library(ASSIMP assimp)
+find_library(ANTTWEAKBAR anttweakbar)
 SET(EXTRA_LIBS 	
 	${GLFW}
 	${IOKIT}
@@ -25,6 +27,8 @@ SET(EXTRA_LIBS
 	${COREVIDEO}
 	${GLEW}
 	${OPENGL}
+	${ASSIMP}
+	${ANTTWEAKBAR}
 )
 
 # compile
@@ -39,5 +43,5 @@ FILE(COPY ${GLSL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/shaders)
 FILE(GLOB GLSL textures/*)
 FILE(COPY ${GLSL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/textures)
 
-# FIND_LIBRARY(ASSIMP assimp)
-# FIND_LIBRARY(ANTTWEAKBAR anttweakbar)
+FILE(GLOB GLSL models/*)
+FILE(COPY ${GLSL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/models)

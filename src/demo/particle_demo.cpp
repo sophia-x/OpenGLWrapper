@@ -1,6 +1,3 @@
-#include <iostream>
-using namespace std;
-
 #include <gui/WindowManager.hpp>
 
 #include <controllers/MouseCameraController.hpp>
@@ -12,11 +9,7 @@ using namespace std;
 
 #include "Demo.hpp"
 
-#define WIDTH 1024
-#define HEIGHT 768
-#define TITLE "OpenGL Wrapper"
-#define NAME "MAIN"
-#define BG_COLOR vec4(0.0, 0.0, 0.4, 0.0)
+#define TITLE "Particle"
 
 void particle_demo() {
 	WindowManager &manager = WindowManager::getWindowManager();
@@ -24,7 +17,7 @@ void particle_demo() {
 	WindowManager::getWindowManager().addWindow(NAME, createWindow(WIDTH, HEIGHT, TITLE, NAME));
 	manager.setCurrent(NAME);
 	manager.turnGlewOn();
-	manager.addCurrentController(new MouseCameraController(manager.getCurrentWindow(), vec3(0, 0, 5), 3.14f, 0.0f, 45.0f, 3.0f, 0.005f));
+	manager.addCurrentController(new MouseCameraController(manager.getCurrentWindow(), vec3(0, 0, 5), 45.0f, 3.14f, 0.0f, 3.0f, 0.005f, 0.5f));
 	opengl_init(BG_COLOR);
 
 	World *world = new World();
@@ -35,13 +28,7 @@ void particle_demo() {
 	particle_model_ptr->setTexture("textures/particle.DDS");
 	world->addModel("Particles", particle_model_ptr);
 
-	vector<string> names {
-		"camera_right_worldspace",
-		"camera_up_worldspace",
-		"vp",
-		"texture_in"
-	};
-	world->addShader("Particle", new Shader("shaders/Particle.vertexshader", "shaders/Particle.fragmentshader", names));
+	init_particle_shader(world);
 
 	Timer timer;
 	while (manager.next()) {

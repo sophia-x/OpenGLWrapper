@@ -34,20 +34,12 @@ public:
 		windows[name] = window;
 	}
 
-	inline void addController(const string &name, CameraController *controller) {
-		controllers[name].push(unique_ptr<CameraController>(controller));
-	}
-
 	inline void addCurrentController(CameraController *controller) {
-		addController(currentName, controller);
+		controllers[currentName].push(unique_ptr<CameraController>(controller));
 	}
 
 	inline void addWorld(const string &name, World *world) {
 		worlds[name] = unique_ptr<World>(world);
-	}
-
-	inline void setCurrentWorld(const string &name) {
-		current_world_name = name;
 	}
 
 	inline void setCurrent(const string &name) {
@@ -57,16 +49,16 @@ public:
 		glfwMakeContextCurrent(currentWindow);
 	}
 
+	inline void setCurrentWorld(const string &name) {
+		current_world_name = name;
+	}
+
 	inline GLFWwindow* getWindow(const string &name) {
 		return windows[name];
 	}
 
 	inline GLFWwindow* getCurrentWindow() {
 		return currentWindow;
-	}
-
-	inline const string& getCurrentName() const {
-		return currentName;
 	}
 
 	inline CameraController& getCurrentController() {

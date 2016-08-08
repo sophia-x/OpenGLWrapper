@@ -1,5 +1,5 @@
-#ifndef SHADER
-#define SHADER
+#ifndef SHADER_H
+#define SHADER_H
 
 #include <string>
 #include <vector>

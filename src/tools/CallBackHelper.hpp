@@ -1,5 +1,5 @@
-#ifndef CALL_BACK_HELPER
-#define CALL_BACK_HELPER
+#ifndef CALL_BACK_HELPER_H
+#define CALL_BACK_HELPER_H
 
 #include <map>
 using namespace std;

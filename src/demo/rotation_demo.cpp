@@ -77,7 +77,9 @@ void rotation_demo() {
 	World *world = new World();
 	manager.addWorld(NAME, world);
 	manager.setCurrentWorld(NAME);
-	init_standard_shader(world);
+
+	static const string STANDARD_SHADER_NAME  = "Standard_Shader";
+	init_standard_shader(world, "shaders/StandardShading.vertexshader", "shaders/StandardShading.fragmentshader", STANDARD_SHADER_NAME);
 
 	PointLight *light = new PointLight(vec3(4), vec3(1), 50.f);
 	world->addLight(LIGHT_NAME, light);
@@ -88,8 +90,8 @@ void rotation_demo() {
 	SingleModel *model_ptr = new SingleModel("models/monkey.obj");
 	model_ptr->addTexture(TEXTURE_NAME, "textures/monkey.DDS");
 	model_ptr->setLightName(LIGHT_NAME);
-	model_ptr->addInstance(EULER, Instance(TEXTURE_NAME, MATERIAL_NAME, standard_set_up_shader));
-	model_ptr->addInstance(QUAT, Instance(TEXTURE_NAME, MATERIAL_NAME, standard_set_up_shader));
+	model_ptr->addInstance(EULER, SingleModelInstance(STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME, standard_set_up_shader));
+	model_ptr->addInstance(QUAT, SingleModelInstance(STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME, standard_set_up_shader));
 
 	world->addModel("Monkey", model_ptr);
 

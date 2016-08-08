@@ -1,5 +1,5 @@
-#ifndef MOUSE_CAMERA_CONTROLLER
-#define MOUSE_CAMERA_CONTROLLER
+#ifndef MOUSE_CAMERA_CONTROLLER_H
+#define MOUSE_CAMERA_CONTROLLER_H
 
 #include <functional>
 using namespace std;

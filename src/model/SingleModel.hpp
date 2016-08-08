@@ -1,5 +1,5 @@
-#ifndef NORMAL_MODEL
-#define NORMAL_MODEL
+#ifndef NORMAL_MODEL_H
+#define NORMAL_MODEL_H
 
 #include <vector>
 #include <string>
@@ -14,22 +14,18 @@ using namespace glm;
 #include "Model.hpp"
 
 class SingleModel;
-struct Instance;
 
-struct Instance {
-	Instance() {}
-	Instance(const string &p_texture_name, const string &p_material_name, void(*p_set_up_shader)(const SingleModel &, const Instance &),
-	         vec3 p_pos = vec3(), quat p_orig = quat(), bool p_show_up = true): texture_name{p_texture_name}, material_name{p_material_name},
-		set_up_shader{p_set_up_shader}, pos{p_pos}, origentation{p_orig}, show_up{p_show_up} {}
-
-	vec3 pos;
-	quat origentation;
+struct SingleModelInstance: Instance {
+	SingleModelInstance() {}
+	SingleModelInstance(const string& p_shader_name, const string &p_texture_name, const string &p_material_name,
+	                    void(*p_set_up_shader)(const SingleModel &, const SingleModelInstance &), const vec3 &p_pos = vec3(),
+	                    const quat &p_orig = quat(), const vec3 &p_size = vec3(1.0f), bool p_show_up = true):
+		Instance{p_shader_name, 0, p_pos, p_orig, p_size, p_show_up}, texture_name{p_texture_name}, material_name{p_material_name},
+		set_up_shader{p_set_up_shader} {}
 
 	string texture_name;
 	string material_name;
-	void(*set_up_shader)(const SingleModel &, const Instance &);
-
-	bool show_up;
+	void(*set_up_shader)(const SingleModel &, const SingleModelInstance &);
 };
 
 class SingleModel: public Model {
@@ -53,7 +49,7 @@ public:
 		textures[name] = loadTexture(path);
 	}
 
-	inline void addInstance(const string &name, const Instance &instance) {
+	inline void addInstance(const string &name, const SingleModelInstance &instance) {
 		instances[name] = instance;
 	}
 
@@ -93,10 +89,10 @@ private:
 
 	string light_name;
 
-	map<string, Instance> instances;
+	map<string, SingleModelInstance> instances;
 };
 
-void init_standard_shader(World *world);
-void standard_set_up_shader(const SingleModel &model, const Instance &ins);
+void init_standard_shader(World *world, const string &vertex_path, const string &freg_path, const string &name);
+void standard_set_up_shader(const SingleModel &model, const SingleModelInstance &ins);
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef QUATERNION
-#define QUATERNION
+#ifndef QUATERNION_H
+#define QUATERNION_H
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>

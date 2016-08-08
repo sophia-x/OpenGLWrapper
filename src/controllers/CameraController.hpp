@@ -1,5 +1,5 @@
-#ifndef CAMERA_CONTROLLER
-#define CAMERA_CONTROLLER
+#ifndef CAMERA_CONTROLLER_H
+#define CAMERA_CONTROLLER_H
 
 #include <GLFW/glfw3.h>
 

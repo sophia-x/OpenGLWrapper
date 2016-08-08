@@ -4,35 +4,47 @@
 
 #include "ParticleModel.hpp"
 
-static const string PARTICLE_SHADER_NAME = "Particle_Shader";
-
-void init_particle_shader(World *world) {
+void init_particle_shader(World *world, const string &vertex_path, const string &frag_path, const string &name) {
 	vector<string> names {
 		"camera_right_worldspace",
 		"camera_up_worldspace",
 		"vp",
 		"texture_in"
 	};
-	world->addShader(PARTICLE_SHADER_NAME, new Shader("shaders/Particle.vertexshader", "shaders/Particle.fragmentshader", names));
+	world->addShader(name, new Shader(vertex_path, frag_path, names));
 }
 
-ParticleModel::ParticleModel(size_t p_max_num): MAX_NUM{p_max_num}, MAX_POS_SIZE{p_max_num * 4 * sizeof(GLfloat)},
-	MAX_COLOR_SIZE(p_max_num * 4 * sizeof(GLubyte)), particles(0), g_particule_position_size_data(p_max_num * 4),
-	particle_ptrs(p_max_num) , g_particule_color_data(p_max_num * 4) {
+void particle_set_up_shader(const ParticleModel &model) {
+	const Shader &shader = WindowManager::getWindowManager().getCurrentWorld().getShader(model.getShaderName());
+	glUseProgram(shader.getID());
+	// Bind texture in Texture Unit 0
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, model.getTexture());
+	glUniform1i(shader.getUniform("texture_in"), 0);
+
+	const CameraController& controller = WindowManager::getWindowManager().getCurrentController();
+	const mat4 &projection_matrix = controller.getProjectionMatrix();
+	const mat4 &view_matrix = controller.getViewMatrix();
+	mat4 view_projection_matrix = projection_matrix * view_matrix;
+
+	glUniform3f(shader.getUniform("camera_right_worldspace"), view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
+	glUniform3f(shader.getUniform("camera_up_worldspace"), view_matrix[0][1], view_matrix[1][1], view_matrix[2][1]);
+	glUniformMatrix4fv(shader.getUniform("vp"), 1, GL_FALSE, &view_projection_matrix[0][0]);
+}
+
+ParticleModel::ParticleModel(const vector<GLfloat> &p_vertex, const string& p_shader_name,
+                             void(*p_set_up_shader_ptr)(const ParticleModel &), size_t p_max_num):
+	g_vertex_buffer_data{p_vertex}, shader_name{p_shader_name}, MAX_NUM{p_max_num}, set_up_shader_ptr{p_set_up_shader_ptr},
+	MAX_POS_SIZE{p_max_num * 4 * sizeof(GLfloat)}, MAX_COLOR_SIZE(p_max_num * 4 * sizeof(GLubyte)), particles(0),
+	g_particule_position_size_data(p_max_num * 4), particle_ptrs(p_max_num) , g_particule_color_data(p_max_num * 4) {
 
 	particles.reserve(MAX_NUM);
 
-	const GLfloat g_vertex_buffer_data[] {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		-0.5f,  0.5f, 0.0f,
-		0.5f,  0.5f, 0.0f,
-	};
 	glBindVertexArray(vertex_array_ID);
 	{
 		glGenBuffers(1, &billboard_vertex_buffer);
 		glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, g_vertex_buffer_data.size()*sizeof(GLfloat), &g_vertex_buffer_data[0], GL_STATIC_DRAW);
 
 		// The VBO containing the positions and sizes of the particles
 		glGenBuffers(1, &particles_position_buffer);
@@ -49,8 +61,6 @@ ParticleModel::ParticleModel(size_t p_max_num): MAX_NUM{p_max_num}, MAX_POS_SIZE
 	glBindVertexArray(0);
 }
 
-#include <iostream>
-using namespace std;
 void ParticleModel::update(double delta) {
 	const vec3& camera_pos = WindowManager::getWindowManager().getCurrentController().getCameraPosition();
 
@@ -102,23 +112,7 @@ void ParticleModel::draw() {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		{
-			const Shader &shader = WindowManager::getWindowManager().getCurrentWorld().getShader(PARTICLE_SHADER_NAME);
-			glUseProgram(shader.getID());
-			// Bind texture in Texture Unit 0
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texture);
-			glUniform1i(shader.getUniform("texture_in"), 0);
-
-			const CameraController& controller = WindowManager::getWindowManager().getCurrentController();
-			const mat4 &projection_matrix = controller.getProjectionMatrix();
-			const mat4 &view_matrix = controller.getViewMatrix();
-			mat4 view_projection_matrix = projection_matrix * view_matrix;
-
-			glUniform3f(shader.getUniform("camera_right_worldspace"), view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
-			glUniform3f(shader.getUniform("camera_up_worldspace"), view_matrix[0][1], view_matrix[1][1], view_matrix[2][1]);
-			glUniformMatrix4fv(shader.getUniform("vp"), 1, GL_FALSE, &view_projection_matrix[0][0]);
-		}
+		set_up_shader_ptr(*this);
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -161,6 +155,9 @@ void ParticleModel::draw() {
 		glVertexAttribDivisor(2, 1); // color : one per quad                                  -> 1
 
 		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particles.size());
+
+
+		glDisable(GL_BLEND);
 
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);

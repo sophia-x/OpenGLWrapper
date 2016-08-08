@@ -1,5 +1,5 @@
-#ifndef DEMO
-#define DEMO
+#ifndef DEMO_H
+#define DEMO_H
 
 #define WIDTH 1024
 #define HEIGHT 768
@@ -8,5 +8,6 @@
 
 void particle_demo();
 void rotation_demo();
+void billboard_demo();
 
 #endif

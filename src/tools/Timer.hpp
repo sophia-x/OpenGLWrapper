@@ -1,5 +1,5 @@
-#ifndef TIMER
-#define TIMER
+#ifndef TIMER_H
+#define TIMER_H
 
 #include <stdio.h>
 
@@ -21,6 +21,10 @@ public:
 			n_frames = 0;
 			passed = 0;
 		}
+	}
+
+	inline double getCurrentTime() const{
+		return p_time;
 	}
 
 	inline double getDelta() const {

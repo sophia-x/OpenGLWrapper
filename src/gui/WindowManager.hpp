@@ -1,5 +1,5 @@
-#ifndef WINDOW_MANAGER
-#define WINDOW_MANAGER
+#ifndef WINDOW_MANAGER_H
+#define WINDOW_MANAGER_H
 
 #include <string>
 #include <map>

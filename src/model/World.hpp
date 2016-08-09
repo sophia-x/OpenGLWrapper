@@ -45,7 +45,7 @@ public:
 		for (auto it = models.begin(); it != models.end(); ++it) {
 			Model &model = *(it->second);
 			model.update(delta);
-			model.draw();
+			model.draw_buffer();
 		}
 	}
 

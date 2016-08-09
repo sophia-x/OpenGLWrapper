@@ -14,8 +14,9 @@ using namespace glm;
 
 class Model {
 public:
-	Model() {
+	Model(): border{4} {
 		glGenVertexArrays(1, &vertex_array_ID);
+		glGetIntegerv(GL_VIEWPORT, &border[0]);
 	}
 
 	virtual ~Model() {
@@ -25,10 +26,25 @@ public:
 	virtual void update(double delta) = 0;
 	virtual void draw() = 0;
 
+	void draw_buffer() {
+		vector<GLint> p_border(4);
+		glGetIntegerv(GL_VIEWPORT, &p_border[0]);
+		glViewport(border[0], border[1], border[2], border[3]);
+
+		draw();
+
+		glViewport(p_border[0], p_border[1], p_border[2], p_border[3]);
+	}
+
+	void setBorder(const vector<GLint> &p_border) {
+		border = p_border;
+	}
+
 	GLuint loadTexture(const string &texture_path) const;
 
 protected:
 	GLuint vertex_array_ID;
+	vector<GLint> border;
 };
 
 struct Instance {

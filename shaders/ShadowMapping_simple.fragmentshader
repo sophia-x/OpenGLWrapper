@@ -1,0 +1,22 @@
+#version 330 core
+
+in vec2 UV;
+in vec4 shadow_coord;
+
+// Ouput data
+layout(location = 0) out vec3 color;
+
+uniform sampler2D texture_in;
+uniform sampler2DShadow shadowMap;
+uniform vec3 light_color;
+uniform float bias;
+
+void main(){	
+	vec3 MaterialDiffuseColor = texture( texture_in, UV ).rgb;
+
+	float visibility = texture(shadowMap, vec3(shadow_coord.xy, (shadow_coord.z-bias)/shadow_coord.w));
+	// if (visibility < 0.5)
+	// 	visibility = 0.5;
+
+	color = visibility * MaterialDiffuseColor * light_color;
+}

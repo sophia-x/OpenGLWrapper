@@ -42,8 +42,8 @@ public:
 			glDeleteTextures(1, &it->second);
 	}
 
-	void update(double delta);
-	void draw();
+	virtual void update(double delta);
+	virtual void draw();
 
 	inline void addTexture(const string &name, const string &path) {
 		textures[name] = loadTexture(path);
@@ -77,7 +77,7 @@ public:
 		return textures.at(name);
 	}
 
-private:
+protected:
 	vector<unsigned short> indices;
 	vector<vec3> vertices;
 	vector<vec2> uvs;

@@ -1,0 +1,21 @@
+#version 330 core
+
+layout(location = 0) in vec3 vertex_position_modelspace;
+layout(location = 1) in vec2 vertex_UV;
+layout(location = 2) in vec3 vertex_normal_modelspace;
+
+out vec2 UV;
+out vec4 shadow_coord;
+
+uniform mat4 MVP;
+uniform mat4 DepthBiasMVP;
+
+void main(){
+	// Output position of the vertex, in clip space : MVP * position
+	gl_Position =  MVP * vec4(vertex_position_modelspace,1);
+	
+	shadow_coord = DepthBiasMVP * vec4(vertex_position_modelspace,1);
+	
+	UV = vertex_UV;
+}
+

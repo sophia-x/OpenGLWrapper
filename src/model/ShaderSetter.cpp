@@ -3,6 +3,7 @@
 #include "SingleModel.hpp"
 #include "VertexColorModel.hpp"
 #include "VertexTextureModel.hpp"
+#include "SingleTextureModel.hpp"
 
 void init_standard_shader(World *world, const string &vertex_path, const string &freg_path, const string &name) {
 	vector<string> names {
@@ -149,4 +150,93 @@ void billboard_more_set_up_shader(const VertexTextureModel &model, const VertexT
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, model.getTexture(ins.texture_name));
 	glUniform1i(shader.getUniform("texture_in"), 0);
+}
+
+void init_shadow_map_simple_shader(World *world, const string& vertex_path, const string& freg_path, const string& name) {
+	vector<string> names {
+		"MVP",
+		"DepthBiasMVP",
+		"texture_in",
+		"shadowMap",
+		"light_color",
+		"bias"
+	};
+	world->addShader(name, new Shader(vertex_path, freg_path, names));
+}
+void shadow_map_simple_set_up_shader(const SingleModel &model, const SingleModelInstance &ins) {
+	const SingleTextureModel& sh_model = (const SingleTextureModel&)model;
+
+	const Shader &shader = WindowManager::getWindowManager().getCurrentWorld().getShader(ins.shader_name);
+	glUseProgram(shader.getID());
+
+	const mat4 &model_matrix = ins.getModelMatrix();
+	const CameraController& controller = WindowManager::getWindowManager().getCurrentController();
+	const mat4 &projection_matrix = controller.getProjectionMatrix();
+	const mat4 &view_matrix = controller.getViewMatrix();
+	mat4 MVP = projection_matrix * view_matrix * model_matrix;
+	glUniformMatrix4fv(shader.getUniform("MVP"), 1, GL_FALSE, &MVP[0][0]);
+
+	mat4 bias_matrix(
+	    0.5, 0.0, 0.0, 0.0,
+	    0.0, 0.5, 0.0, 0.0,
+	    0.0, 0.0, 0.5, 0.0,
+	    0.5, 0.5, 0.5, 1.0
+	);
+	mat4 depth_bias_MVP = bias_matrix * sh_model.getMVP();
+	glUniformMatrix4fv(shader.getUniform("DepthBiasMVP"), 1, GL_FALSE, &depth_bias_MVP[0][0]);
+
+	// Bind our texture in Texture Unit 0
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, sh_model.getTexture(ins.texture_name));
+	glUniform1i(shader.getUniform("texture_in"), 0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, sh_model.getBufferTexture());
+	glUniform1i(shader.getUniform("shadowMap"), 1);
+
+	glUniform3fv(shader.getUniform("light_color"), 1,
+	             &WindowManager::getWindowManager().getCurrentWorld().getLight(sh_model.getLightName()).getLightColor()[0]);
+
+	glUniform1f(shader.getUniform("bias"), 0.005);
+}
+
+void init_depth_shader(World *world, const string& vertex_path, const string& freg_path, const string& name) {
+	vector<string> names {
+		"depthMVP"
+	};
+	world->addShader(name, new Shader(vertex_path, freg_path, names));
+}
+
+void depth_shader_set_up(SingleTextureModel &model, const SingleModelInstance &ins) {
+	const Shader &shader = WindowManager::getWindowManager().getCurrentWorld().getShader(model.getTextureShaderName());
+	glUseProgram(shader.getID());
+
+	const vec3& light_pos = WindowManager::getWindowManager().getCurrentWorld().getLight(model.getLightName()).getLightPos();
+
+	// Compute the MVP matrix from the light's point of view
+	mat4 depthProjectionMatrix = glm::ortho<float>(-10, 10, -10, 10, -10, 20);
+	mat4 depthViewMatrix = glm::lookAt(light_pos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+
+	mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * ins.getModelMatrix();
+
+	glUniformMatrix4fv(shader.getUniform("depthMVP"), 1, GL_FALSE, &depthMVP[0][0]);
+
+	model.setUpMVP(depthMVP);
+}
+
+void init_passthrough_shader(World *world, const string& vertex_path, const string& freg_path, const string& name) {
+	vector<string> names {
+		"rendered_texture"
+	};
+	world->addShader(name, new Shader(vertex_path, freg_path, names));
+}
+
+void passthrough_shader_set_up(const VertexTextureModel &model, const VertexTextureInstance &ins) {
+	const Shader &shader = WindowManager::getWindowManager().getCurrentWorld().getShader(ins.shader_name);
+	glUseProgram(shader.getID());
+
+	// Bind our texture in Texture Unit 0
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, model.getTexture(ins.texture_name));
+	glUniform1i(shader.getUniform("rendered_texture"), 0);
 }

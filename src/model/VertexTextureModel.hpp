@@ -47,6 +47,10 @@ public:
 		textures[name] = loadTexture(path);
 	}
 
+	inline void addTexture(const string &name, GLuint texture) {
+		textures[name] = texture;
+	}
+
 	inline void addInstance(const string &name, const VertexTextureInstance &ins) {
 		instances[name] = ins;
 	}
@@ -76,5 +80,8 @@ void billboard_less_set_up_shader(const VertexTextureModel &model, const VertexT
 
 void init_billboard_more_shader(World *world, const string& vertex_path, const string& freg_path, const string& name);
 void billboard_more_set_up_shader(const VertexTextureModel &model, const VertexTextureInstance &ins);
+
+void init_passthrough_shader(World *world, const string& vertex_path, const string& freg_path, const string& name);
+void passthrough_shader_set_up(const VertexTextureModel &model, const VertexTextureInstance &ins);
 
 #endif

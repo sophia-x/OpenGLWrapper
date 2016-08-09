@@ -9,5 +9,6 @@
 void particle_demo();
 void rotation_demo();
 void billboard_demo();
+void shadow_map_demo();
 
 #endif

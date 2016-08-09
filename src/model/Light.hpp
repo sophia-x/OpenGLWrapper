@@ -11,6 +11,10 @@ public:
 	virtual ~Light() {}
 
 	virtual void setUniforms(const vector<GLuint>& ids) const = 0;
+
+	virtual const vec3& getLightPos() const = 0;
+
+	virtual const vec3& getLightColor() const = 0;
 };
 
 class PointLight: public Light {
@@ -22,6 +26,14 @@ public:
 		glUniform3f(ids[0], light_pos.x, light_pos.y, light_pos.z);
 		glUniform3f(ids[1], light_color.x, light_color.y, light_color.z);
 		glUniform1f(ids[2], light_power);
+	}
+
+	const vec3& getLightPos() const {
+		return light_pos;
+	}
+
+	const vec3& getLightColor() const {
+		return light_color;
 	}
 
 private:

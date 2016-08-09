@@ -240,3 +240,74 @@ void passthrough_shader_set_up(const VertexTextureModel &model, const VertexText
 	glBindTexture(GL_TEXTURE_2D, model.getTexture(ins.texture_name));
 	glUniform1i(shader.getUniform("rendered_texture"), 0);
 }
+
+void init_shadow_map_standard_shader(World *world, const string& vertex_path, const string& freg_path, const string& name) {
+	vector<string> names {
+		"MVP",
+		"V",
+		"M",
+		"depth_bias_MVP",
+		"texture_in",
+		"light_position_worldspace",
+		"light_color",
+		"light_power",
+		"ambient_ratio",
+		"material_specular_color",
+		"pow_index",
+		"bias_ratio",
+		"shadowMap"
+	};
+	world->addShader(name, new Shader(vertex_path, freg_path, names));
+}
+void shadow_map_standard_set_up_shader(const SingleModel &r_model, const SingleModelInstance &ins) {
+	const SingleTextureModel& model = (const SingleTextureModel&)r_model;
+
+	const Shader &shader = WindowManager::getWindowManager().getCurrentWorld().getShader(ins.shader_name);
+	glUseProgram(shader.getID());
+
+	const mat4 &model_matrix = ins.getModelMatrix();
+	const CameraController& controller = WindowManager::getWindowManager().getCurrentController();
+	const mat4 &projection_matrix = controller.getProjectionMatrix();
+	const mat4 &view_matrix = controller.getViewMatrix();
+	mat4 MVP = projection_matrix * view_matrix * model_matrix;
+	glUniformMatrix4fv(shader.getUniform("MVP"), 1, GL_FALSE, &MVP[0][0]);
+	glUniformMatrix4fv(shader.getUniform("V"), 1, GL_FALSE, &view_matrix[0][0]);
+	glUniformMatrix4fv(shader.getUniform("M"), 1, GL_FALSE, &model_matrix[0][0]);
+
+	mat4 bias_matrix(
+	    0.5, 0.0, 0.0, 0.0,
+	    0.0, 0.5, 0.0, 0.0,
+	    0.0, 0.0, 0.5, 0.0,
+	    0.5, 0.5, 0.5, 1.0
+	);
+	mat4 depth_bias_MVP = bias_matrix * model.getMVP();
+	glUniformMatrix4fv(shader.getUniform("depth_bias_MVP"), 1, GL_FALSE, &depth_bias_MVP[0][0]);
+
+	// Bind our texture in Texture Unit 0
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, model.getTexture(ins.texture_name));
+	glUniform1i(shader.getUniform("texture_in"), 0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, model.getBufferTexture());
+	glUniform1i(shader.getUniform("shadowMap"), 1);
+
+	glUniform3fv(shader.getUniform("light_color"), 1,
+	             &WindowManager::getWindowManager().getCurrentWorld().getLight(model.getLightName()).getLightColor()[0]);
+
+	glUniform1f(shader.getUniform("bias_ratio"), 0.005);
+
+	WindowManager::getWindowManager().getCurrentWorld().getLight(model.getLightName()).setUniforms(vector<GLuint>
+	{
+		shader.getUniform("light_position_worldspace"),
+		shader.getUniform("light_color"),
+		shader.getUniform("light_power")
+	});
+
+	WindowManager::getWindowManager().getCurrentWorld().getMaterial(ins.material_name).setUniforms(vector<GLuint>
+	{
+		shader.getUniform("ambient_ratio"),
+		shader.getUniform("material_specular_color"),
+		shader.getUniform("pow_index")
+	});
+}

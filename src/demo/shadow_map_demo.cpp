@@ -15,6 +15,7 @@
 #define TITLE "Shadow Map Demo"
 #define LIGHT_NAME "Light"
 #define TEXTURE_NAME "Room_Texture"
+#define MATERIAL_NAME "Material"
 
 void shadow_map_demo() {
 	WindowManager &manager = WindowManager::getWindowManager();
@@ -30,19 +31,24 @@ void shadow_map_demo() {
 	manager.setCurrentWorld(NAME);
 
 	static const string SHADOW_MAP_NAME  = "Shadow_Map";
-	init_shadow_map_simple_shader(world, "shaders/ShadowMapping_simple.vertexshader", "shaders/ShadowMapping_simple.fragmentshader", SHADOW_MAP_NAME);
+	// init_shadow_map_simple_shader(world, "shaders/ShadowMapping_simple.vertexshader", "shaders/ShadowMapping_simple.fragmentshader", SHADOW_MAP_NAME);
+	init_shadow_map_standard_shader(world, "shaders/ShadowMapping.vertexshader", "shaders/ShadowMapping.fragmentshader", SHADOW_MAP_NAME);
 	static const string DEPTH_NAME  = "Depth";
 	init_depth_shader(world, "shaders/DepthRTT.vertexshader", "shaders/DepthRTT.fragmentshader", DEPTH_NAME);
 	static const string PASS_THROUGH_NAME  = "PassThrough";
 	init_passthrough_shader(world, "shaders/Passthrough.vertexshader", "shaders/Passthrough.fragmentshader", PASS_THROUGH_NAME);
 
-	PointLight *light = new PointLight(vec3(0.5, 2, 2), vec3(1), 50.f);
+	PointLight *light = new PointLight(vec3(0.5, 2, 2), vec3(1), 1.0f);
 	world->addLight(LIGHT_NAME, light);
+
+	PhoneMaterial *material = new PhoneMaterial(vec3(0.1f), vec3(0.3f), 5);
+	world->addMaterial(MATERIAL_NAME, material);
 
 	SingleTextureModel *model_ptr = new SingleTextureModel("models/room_thickwalls.obj", depth_map_set_up, 1024, depth_shader_set_up, DEPTH_NAME);
 	model_ptr->addTexture(TEXTURE_NAME, "textures/room_thickwalls.DDS");
 	model_ptr->setLightName(LIGHT_NAME);
-	model_ptr->addInstance("Room", SingleModelInstance(SHADOW_MAP_NAME, TEXTURE_NAME, "", shadow_map_simple_set_up_shader));
+	// model_ptr->addInstance("Room", SingleModelInstance(SHADOW_MAP_NAME, TEXTURE_NAME, "", shadow_map_simple_set_up_shader));
+	model_ptr->addInstance("Room", SingleModelInstance(SHADOW_MAP_NAME, TEXTURE_NAME, MATERIAL_NAME, shadow_map_standard_set_up_shader));
 	world->addModel("Shadow", model_ptr);
 
 	vector<GLfloat> data = {

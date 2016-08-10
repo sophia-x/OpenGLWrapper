@@ -41,7 +41,7 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	TwEventMousePosGLFW(xpos, ypos);
 }
 
-void setTwUI() {
+static void setTwUI() {
 	// Initialize the GUI
 	TwInit(TW_OPENGL_CORE, NULL);
 	TwWindowSize(WIDTH, HEIGHT);

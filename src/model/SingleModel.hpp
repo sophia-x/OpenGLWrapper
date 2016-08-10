@@ -45,27 +45,43 @@ public:
 	virtual void update(double delta);
 	virtual void draw();
 
-	inline void addTexture(const string &name, const string &path) {
+	inline void useVertexBuffer() {
+		glBindVertexArray(vertex_array_ID);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(
+		    0,
+		    3,                            // size
+		    GL_FLOAT,                     // type
+		    GL_FALSE,                     // normalized?
+		    0,                            // stride
+		    (void*)0                      // array buffer offset
+		);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	}
+
+	inline void addTexture(const string & name, const string & path) {
 		textures[name] = loadTexture(path);
 	}
 
-	inline void addInstance(const string &name, const SingleModelInstance &instance) {
+	inline void addInstance(const string & name, const SingleModelInstance & instance) {
 		instances[name] = instance;
 	}
 
-	inline void setPos(const string &name, const vec3& pos) {
+	inline void setPos(const string & name, const vec3 & pos) {
 		instances[name].pos = pos;
 	}
 
-	inline void setOrientation(const string &name, const quat& orig) {
+	inline void setOrientation(const string & name, const quat & orig) {
 		instances[name].origentation = orig;
 	}
 
-	inline void setShowUp(const string &name, bool show) {
+	inline void setShowUp(const string & name, bool show) {
 		instances[name].show_up = show;
 	}
 
-	inline void setLightName(const string& name) {
+	inline void setLightName(const string & name) {
 		light_name = name;
 	}
 
@@ -73,10 +89,23 @@ public:
 		return light_name;
 	}
 
-	inline GLuint getTexture(const string &name) const {
+	inline GLuint getTexture(const string & name) const {
 		return textures.at(name);
 	}
 
+	inline map<string, SingleModelInstance>& getInstances() {
+		return instances;
+	}
+
+	inline void draw_mesh() {
+		// Draw the triangles !
+		glDrawElements(
+		    GL_TRIANGLES,      // mode
+		    indices.size(),    // count
+		    GL_UNSIGNED_SHORT, // type
+		    (void*)0           // element array buffer offset
+		);
+	}
 protected:
 	vector<unsigned short> indices;
 	vector<vec3> vertices;

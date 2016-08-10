@@ -6,6 +6,7 @@ set (CMAKE_CXX_STANDARD 11)
 # include directory
 include_directories(
 	src/
+	/usr/local/include/bullet
 )
 
 # source directory
@@ -20,6 +21,7 @@ find_library(GLEW glew)
 find_library(OPENGL OpenGL)
 find_library(ASSIMP assimp)
 find_library(ANTTWEAKBAR anttweakbar)
+find_package(Bullet REQUIRED)
 SET(EXTRA_LIBS 	
 	${GLFW}
 	${IOKIT}
@@ -29,6 +31,7 @@ SET(EXTRA_LIBS
 	${OPENGL}
 	${ASSIMP}
 	${ANTTWEAKBAR}
+	${BULLET_LIBRARIES}
 )
 
 # compile

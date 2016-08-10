@@ -10,5 +10,8 @@ void particle_demo();
 void rotation_demo();
 void billboard_demo();
 void shadow_map_demo();
+void pick_by_color_demo();
+void pick_by_bullet_demo();
+void pick_by_udf_demo();
 
 #endif

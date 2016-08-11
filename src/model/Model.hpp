@@ -46,6 +46,7 @@ public:
 	}
 
 	static GLuint loadTexture(const string &texture_path);
+	static GLuint loadTextureBmp(const string &texture_path);
 
 protected:
 	GLuint vertex_array_ID;

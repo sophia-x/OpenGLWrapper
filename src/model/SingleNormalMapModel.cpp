@@ -48,3 +48,20 @@ void SingleNormalMapModel::computeTangentBasis() {
 		}
 	}
 }
+
+void SingleNormalMapModel::pre_draw() {
+	SingleModel::pre_draw();
+
+	glBindBuffer(GL_ARRAY_BUFFER, tangentbuffer);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, bitangentbuffer);
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+}
+
+void SingleNormalMapModel::post_draw(){
+	glDisableVertexAttribArray(3);
+	glDisableVertexAttribArray(4);
+}

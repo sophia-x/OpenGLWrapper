@@ -19,6 +19,8 @@
 #define LIGHT_NAME "Light"
 #define MATERIAL_NAME "Material"
 #define TEXTURE_NAME "TEXTURE"
+#define NORAML_NAME "NORMAL"
+#define SPECULAR_NAME "SPECULAR"
 
 void standard_demo() {
 	WindowManager &manager = WindowManager::getWindowManager();
@@ -37,9 +39,9 @@ void standard_demo() {
 	shared_ptr<Base> base_ptr{new Base()};
 
 	static const string STANDARD_SHADER_NAME  = "Standard_Shader";
-	init_standard_shader(world, "shaders/StandardShading.vertexshader", "shaders/StandardShading.fragmentshader", STANDARD_SHADER_NAME);
+	init_normal_shader(world, "shaders/NormalMapping.vertexshader", "shaders/NormalMapping.fragmentshader", STANDARD_SHADER_NAME);
 
-	PointLight *light = new PointLight(vec3(4), vec3(1), 50.f);
+	PointLight *light = new PointLight(vec3(0, 0, 4), vec3(1), 50.f);
 	world->addLight(LIGHT_NAME, light);
 
 	PhoneMaterial *material = new PhoneMaterial(vec3(0.1f), vec3(0.3f), 5);
@@ -47,10 +49,13 @@ void standard_demo() {
 
 	// SingleNormalMapModel *model_ptr = new SingleNormalMapModel("models/monkey.obj");
 	SingleNormalMapModel *model_ptr = new SingleNormalMapModel("models/cylinder.obj");
-	model_ptr->addTexture(TEXTURE_NAME, "textures/monkey.DDS");
+	// model_ptr->addTexture(TEXTURE_NAME, "textures/monkey.DDS");
+	model_ptr->addTexture(TEXTURE_NAME, "textures/diffuse.DDS");
+	model_ptr->addTexture(NORAML_NAME, "textures/normal.bmp", 1);
+	model_ptr->addTexture(SPECULAR_NAME, "textures/specular.DDS");
 	model_ptr->setLightName(LIGHT_NAME);
-	model_ptr->addInstance("Monkey", SingleModelInstance(base_ptr, STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME, standard_set_up_shader));
-	world->addModel("Monkey", model_ptr);
+	model_ptr->addInstance("Cylinder", SingleModelInstance(base_ptr, STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME, normal_set_up_shader, NORAML_NAME, SPECULAR_NAME));
+	world->addModel("Cylinder", model_ptr);
 
 	static const string TEXT_SHADER_NAME  = "Text_Shader";
 	init_text_shader(world, "shaders/TextVertexShader.vertexshader", "shaders/TextVertexShader.fragmentshader", TEXT_SHADER_NAME);
@@ -60,11 +65,11 @@ void standard_demo() {
 	static const string DEBUG_SHADER_NAME = "Debug_Shader";
 	init_debug_shader(world, "shaders/DebugVertexShader.vertexshader", "shaders/DebugFragmentShader.fragmentshader", DEBUG_SHADER_NAME);
 	DebugModel *normal_debug_model_ptr = new DebugModel(vec4(0, 0, 1, 1), GL_LINES);
-	normal_debug_model_ptr->addInstance("Monkey", Instance(base_ptr, DEBUG_SHADER_NAME, debug_set_up_shader));
+	normal_debug_model_ptr->addInstance("Cylinder", Instance(base_ptr, DEBUG_SHADER_NAME, debug_set_up_shader));
 	DebugModel *tangent_debug_model_ptr = new DebugModel(vec4(1, 0, 0, 1), GL_LINES);
-	tangent_debug_model_ptr->addInstance("Monkey", Instance(base_ptr, DEBUG_SHADER_NAME, debug_set_up_shader));
+	tangent_debug_model_ptr->addInstance("Cylinder", Instance(base_ptr, DEBUG_SHADER_NAME, debug_set_up_shader));
 	DebugModel *bitagent_debug_model_ptr = new DebugModel(vec4(0, 1, 0, 1), GL_LINES);
-	bitagent_debug_model_ptr->addInstance("Monkey", Instance(base_ptr, DEBUG_SHADER_NAME, debug_set_up_shader));
+	bitagent_debug_model_ptr->addInstance("Cylinder", Instance(base_ptr, DEBUG_SHADER_NAME, debug_set_up_shader));
 	world->addModel("Normal", normal_debug_model_ptr);
 	world->addModel("Tangent", tangent_debug_model_ptr);
 	world->addModel("Bitagent", bitagent_debug_model_ptr);

@@ -371,3 +371,72 @@ void text_set_up_shader(const TextModel &model) {
 	glBindTexture(GL_TEXTURE_2D, model.getTextureID());
 	glUniform1i(shader.getUniform("texture_in"), 0);
 }
+
+void init_normal_shader(World *world, const string &vertex_path, const string &freg_path, const string &name) {
+	vector<string> names {
+		"MVP",
+		"V",
+		"M",
+		"MV3x3",
+		"DiffuseTextureSampler",
+		"NormalTextureSampler",
+		"SpecularTextureSampler",
+		"LightPosition_worldspace",
+		"LightColor",
+		"LightPower",
+		"MaterialAmbientRatio",
+		"SpecularRatio",
+		"power_index"
+	};
+	world->addShader(name, new Shader(vertex_path, freg_path, names));
+}
+
+void normal_set_up_shader(const Model &r_model, const Instance &r_ins) {
+	const SingleModel& model = (const SingleModel&)r_model;
+	const SingleModelInstance& ins = (const SingleModelInstance&)r_ins;
+
+	const Shader &shader = WindowManager::getWindowManager().getCurrentWorld().getShader(ins.shader_name);
+	glUseProgram(shader.getID());
+
+	WindowManager::getWindowManager().getCurrentWorld().getLight(model.getLightName()).setUniforms(vector<GLuint>
+	{
+		shader.getUniform("LightPosition_worldspace"),
+		shader.getUniform("LightColor"),
+		shader.getUniform("LightPower")
+	});
+
+	WindowManager::getWindowManager().getCurrentWorld().getMaterial(ins.material_name).setUniforms(vector<GLuint>
+	{
+		shader.getUniform("MaterialAmbientRatio"),
+		shader.getUniform("SpecularRatio"),
+		shader.getUniform("power_index")
+	});
+
+	// Build the model matrix
+	const mat4 &model_matrix = ins.base_ptr->getModelMatrix();
+	const CameraController& controller = WindowManager::getWindowManager().getCurrentController();
+	const mat4 &projection_matrix = controller.getProjectionMatrix();
+	const mat4 &view_matrix = controller.getViewMatrix();
+	mat4 MVP = projection_matrix * view_matrix * model_matrix;
+
+	// Send our transformation to the currently bound shader,
+	// in the "MVP" uniform
+	glUniformMatrix4fv(shader.getUniform("MVP"), 1, GL_FALSE, &MVP[0][0]);
+	glUniformMatrix4fv(shader.getUniform("M"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniformMatrix4fv(shader.getUniform("V"), 1, GL_FALSE, &view_matrix[0][0]);
+
+	mat3 ModelView3x3Matrix = mat3(view_matrix * model_matrix);
+	glUniformMatrix3fv(shader.getUniform("MV3x3"), 1, GL_FALSE, &ModelView3x3Matrix[0][0]);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, model.getTexture(ins.texture_name));
+	glUniform1i(shader.getUniform("DiffuseTextureSampler"), 0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, model.getTexture(ins.normal_texture));
+	glUniform1i(shader.getUniform("NormalTextureSampler"), 1);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, model.getTexture(ins.specular_texture));
+	glUniform1i(shader.getUniform("SpecularTextureSampler"), 2);
+}

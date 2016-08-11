@@ -17,11 +17,15 @@ class SingleModel;
 
 struct SingleModelInstance: Instance {
 	SingleModelInstance() {}
-	SingleModelInstance(shared_ptr<Base> p_base_ptr, const string& p_shader_name, const string &p_texture_name, const string &p_material_name,
-	                    void(*p_set_up_shader)(const Model &, const Instance &)):
-		Instance{p_base_ptr, p_shader_name, p_set_up_shader}, texture_name{p_texture_name}, material_name{p_material_name} {}
+	SingleModelInstance(shared_ptr<Base> p_base_ptr, const string& p_shader_name, const string &p_texture_name,
+	                    const string &p_material_name, void(*p_set_up_shader)(const Model &, const Instance &),
+	                    const string& p_normal_texture = "", const string& p_specular_texture = ""):
+		Instance{p_base_ptr, p_shader_name, p_set_up_shader}, texture_name{p_texture_name}, material_name{p_material_name},
+		normal_texture{p_normal_texture}, specular_texture{p_specular_texture}  {}
 
 	string texture_name;
+	string normal_texture;
+	string specular_texture;
 	string material_name;
 };
 
@@ -44,7 +48,7 @@ public:
 	virtual void in_draw();
 	virtual void post_draw();
 
-	inline void bindVertexArray(){
+	inline void bindVertexArray() {
 		glBindVertexArray(vertex_array_ID);
 	}
 
@@ -63,8 +67,12 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	}
 
-	inline void addTexture(const string & name, const string & path) {
-		textures[name] = loadTexture(path);
+	inline void addTexture(const string & name, const string & path, int mode = 0) {
+		if (mode == 0) {
+			textures[name] = loadTexture(path);
+			return;
+		}
+		textures[name] = loadTextureBmp(path);
 	}
 
 	inline void addInstance(const string & name, const SingleModelInstance & instance) {

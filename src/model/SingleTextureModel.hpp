@@ -15,7 +15,8 @@ public:
 
 	void render_texture();
 
-	void draw();
+	inline virtual void update(double delta) {}
+	virtual void pre_draw();
 
 	void setUpMVP(const mat4& mvp) {
 		MVP = mvp;
@@ -49,12 +50,12 @@ private:
 void depth_map_set_up(size_t size);
 
 void init_shadow_map_simple_shader(World *world, const string& vertex_path, const string& freg_path, const string& name);
-void shadow_map_simple_set_up_shader(const SingleModel &model, const SingleModelInstance &ins);
+void shadow_map_simple_set_up_shader(const Model &model, const Instance& ins);
 
 void init_depth_shader(World *world, const string& vertex_path, const string& freg_path, const string& name);
 void depth_shader_set_up(SingleTextureModel& model, const SingleModelInstance& ins);
 
 void init_shadow_map_standard_shader(World *world, const string& vertex_path, const string& freg_path, const string& name);
-void shadow_map_standard_set_up_shader(const SingleModel &model, const SingleModelInstance &ins);
+void shadow_map_standard_set_up_shader(const Model &model, const Instance &ins);
 
 #endif

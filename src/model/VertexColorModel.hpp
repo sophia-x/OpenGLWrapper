@@ -35,8 +35,10 @@ public:
 		instances[name] = ins;
 	}
 
-	void update(double delta);
-	void draw();
+	virtual void update(double delta);
+	virtual void pre_draw();
+	virtual void in_draw();
+	virtual void post_draw();
 
 private:
 	vector<vec3> vertex_data;

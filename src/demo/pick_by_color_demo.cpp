@@ -65,8 +65,8 @@ void pick_by_color_demo() {
 	for (int i = 0; i < 100; i++) {
 		vec3 pos = vec3(rand() % 20 - 10, rand() % 20 - 10, rand() % 20 - 10);
 		quat orientation = quat(vec3(rand() % 360, rand() % 360, rand() % 360));
-		model_ptr->addInstance(to_string(i), SingleModelInstance(STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME,
-		                       standard_set_up_shader, pos, orientation));
+		model_ptr->addInstance(to_string(i), SingleModelInstance(shared_ptr<Base>{new Base(pos, orientation)}, STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME,
+		                       standard_set_up_shader));
 	}
 	world->addModel("Monkey", model_ptr);
 
@@ -99,17 +99,17 @@ void pick_by_color(SingleModel &model, string name) {
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	model.bindVertexArray();
 	model.useVertexBuffer();
 
 	map<string, SingleModelInstance>& instances = model.getInstances();
-
 	for (auto it = instances.begin(); it != instances.end(); it++) {
 		const Shader &shader = WindowManager::getWindowManager().getCurrentWorld().getShader(name);
 		glUseProgram(shader.getID());
 
 		SingleModelInstance& ins = it->second;
 
-		const mat4 &model_matrix = ins.getModelMatrix();
+		const mat4 &model_matrix = ins.base_ptr->getModelMatrix();
 		const CameraController& controller = WindowManager::getWindowManager().getCurrentController();
 		const mat4 &projection_matrix = controller.getProjectionMatrix();
 		const mat4 &view_matrix = controller.getViewMatrix();
@@ -124,6 +124,8 @@ void pick_by_color(SingleModel &model, string name) {
 
 		model.draw_mesh();
 	}
+	
+	glDisableVertexAttribArray(0);
 
 	glFlush();
 	glFinish();

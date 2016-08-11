@@ -47,8 +47,8 @@ void shadow_map_demo() {
 	SingleTextureModel *model_ptr = new SingleTextureModel("models/room_thickwalls.obj", depth_map_set_up, 1024, depth_shader_set_up, DEPTH_NAME);
 	model_ptr->addTexture(TEXTURE_NAME, "textures/room_thickwalls.DDS");
 	model_ptr->setLightName(LIGHT_NAME);
-	// model_ptr->addInstance("Room", SingleModelInstance(SHADOW_MAP_NAME, TEXTURE_NAME, "", shadow_map_simple_set_up_shader));
-	model_ptr->addInstance("Room", SingleModelInstance(SHADOW_MAP_NAME, TEXTURE_NAME, MATERIAL_NAME, shadow_map_standard_set_up_shader));
+	// model_ptr->addInstance("Room", SingleModelInstance(shared_ptr<Base>{new Base()}, SHADOW_MAP_NAME, TEXTURE_NAME, "", shadow_map_simple_set_up_shader));
+	model_ptr->addInstance("Room", SingleModelInstance(shared_ptr<Base>{new Base()},SHADOW_MAP_NAME, TEXTURE_NAME, MATERIAL_NAME, shadow_map_standard_set_up_shader));
 	world->addModel("Shadow", model_ptr);
 
 	vector<GLfloat> data = {
@@ -66,7 +66,7 @@ void shadow_map_demo() {
 	}
 	VertexTextureModel* vertex_texture_model_ptr = new VertexTextureModel(data, uvs, GL_TRIANGLES);
 	vertex_texture_model_ptr->addTexture("Depth_Texture", model_ptr->getBufferTexture());
-	vertex_texture_model_ptr->addInstance("Overview", VertexTextureInstance(PASS_THROUGH_NAME, "Depth_Texture", passthrough_shader_set_up));
+	vertex_texture_model_ptr->addInstance("Overview", VertexTextureInstance(shared_ptr<Base>{new Base()}, PASS_THROUGH_NAME, "Depth_Texture", passthrough_shader_set_up));
 	vertex_texture_model_ptr->setBorder(vector<GLint> {0, 0, 256, 256});
 	world->addModel("Overview", vertex_texture_model_ptr);
 

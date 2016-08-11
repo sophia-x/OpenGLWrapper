@@ -17,15 +17,12 @@ class SingleModel;
 
 struct SingleModelInstance: Instance {
 	SingleModelInstance() {}
-	SingleModelInstance(const string& p_shader_name, const string &p_texture_name, const string &p_material_name,
-	                    void(*p_set_up_shader)(const SingleModel &, const SingleModelInstance &), const vec3 &p_pos = vec3(),
-	                    const quat &p_orig = quat(), const vec3 &p_size = vec3(1.0f), bool p_show_up = true):
-		Instance{p_shader_name, 0, p_pos, p_orig, p_size, p_show_up}, texture_name{p_texture_name}, material_name{p_material_name},
-		set_up_shader{p_set_up_shader} {}
+	SingleModelInstance(shared_ptr<Base> p_base_ptr, const string& p_shader_name, const string &p_texture_name, const string &p_material_name,
+	                    void(*p_set_up_shader)(const Model &, const Instance &)):
+		Instance{p_base_ptr, p_shader_name, p_set_up_shader}, texture_name{p_texture_name}, material_name{p_material_name} {}
 
 	string texture_name;
 	string material_name;
-	void(*set_up_shader)(const SingleModel &, const SingleModelInstance &);
 };
 
 class SingleModel: public Model {
@@ -43,10 +40,15 @@ public:
 	}
 
 	virtual void update(double delta);
-	virtual void draw();
+	virtual void pre_draw();
+	virtual void in_draw();
+	virtual void post_draw();
+
+	inline void bindVertexArray(){
+		glBindVertexArray(vertex_array_ID);
+	}
 
 	inline void useVertexBuffer() {
-		glBindVertexArray(vertex_array_ID);
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer(
@@ -70,15 +72,15 @@ public:
 	}
 
 	inline void setPos(const string & name, const vec3 & pos) {
-		instances[name].pos = pos;
+		instances[name].base_ptr->pos = pos;
 	}
 
 	inline void setOrientation(const string & name, const quat & orig) {
-		instances[name].origentation = orig;
+		instances[name].base_ptr->origentation = orig;
 	}
 
 	inline void setShowUp(const string & name, bool show) {
-		instances[name].show_up = show;
+		instances[name].base_ptr->show_up = show;
 	}
 
 	inline void setLightName(const string & name) {
@@ -95,6 +97,22 @@ public:
 
 	inline map<string, SingleModelInstance>& getInstances() {
 		return instances;
+	}
+
+	inline const vector<unsigned short>& getIndices() const {
+		return indices;
+	}
+
+	inline const vector<vec3>& getVertices() const {
+		return vertices;
+	}
+
+	inline const vector<vec2>& getUVs() const {
+		return uvs;
+	}
+
+	inline const vector<vec3>& getNormals() const {
+		return normals;
 	}
 
 	inline void draw_mesh() {
@@ -122,6 +140,6 @@ protected:
 };
 
 void init_standard_shader(World *world, const string &vertex_path, const string &freg_path, const string &name);
-void standard_set_up_shader(const SingleModel &model, const SingleModelInstance &ins);
+void standard_set_up_shader(const Model &model, const Instance &ins);
 
 #endif

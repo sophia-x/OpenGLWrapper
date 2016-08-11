@@ -75,8 +75,8 @@ void pick_by_udf_demo() {
 	for (int i = 0; i < 100; i++) {
 		vec3 pos = vec3(rand() % 20 - 10, rand() % 20 - 10, rand() % 20 - 10);
 		quat orientation = quat(vec3(rand() % 360, rand() % 360, rand() % 360));
-		model_ptr->addInstance(to_string(i), SingleModelInstance(STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME,
-		                       standard_set_up_shader, pos, orientation));
+		model_ptr->addInstance(to_string(i), SingleModelInstance(shared_ptr<Base>{new Base(pos, orientation)}, STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME,
+		                       standard_set_up_shader));
 	}
 	world->addModel("Monkey", model_ptr);
 
@@ -117,7 +117,7 @@ void pick_by_udf_demo() {
 				            ray_direction,
 				            aabb_min,
 				            aabb_max,
-				            ins.getModelMatrix(),
+				            ins.base_ptr->getModelMatrix(),
 				            intersection_distance)
 				   ) {
 					if (min_dist < 0 || intersection_distance < min_dist) {

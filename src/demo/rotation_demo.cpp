@@ -90,8 +90,8 @@ void rotation_demo() {
 	SingleModel *model_ptr = new SingleModel("models/monkey.obj");
 	model_ptr->addTexture(TEXTURE_NAME, "textures/monkey.DDS");
 	model_ptr->setLightName(LIGHT_NAME);
-	model_ptr->addInstance(EULER, SingleModelInstance(STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME, standard_set_up_shader));
-	model_ptr->addInstance(QUAT, SingleModelInstance(STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME, standard_set_up_shader));
+	model_ptr->addInstance(EULER, SingleModelInstance(shared_ptr<Base>{new Base()}, STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME, standard_set_up_shader));
+	model_ptr->addInstance(QUAT, SingleModelInstance(shared_ptr<Base>{new Base()}, STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME, standard_set_up_shader));
 
 	world->addModel("Monkey", model_ptr);
 

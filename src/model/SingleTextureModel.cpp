@@ -34,49 +34,43 @@ void SingleTextureModel::render_texture() {
 	glCullFace(GL_BACK);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// 1rst attribute buffer : vertices
-	glBindVertexArray(vertex_array_ID);
-	{
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(
-		    0,
-		    3,                            // size
-		    GL_FLOAT,                     // type
-		    GL_FALSE,                     // normalized?
-		    0,                            // stride
-		    (void*)0                      // array buffer offset
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glVertexAttribPointer(
+	    0,
+	    3,                            // size
+	    GL_FLOAT,                     // type
+	    GL_FALSE,                     // normalized?
+	    0,                            // stride
+	    (void*)0                      // array buffer offset
+	);
+
+	// Index buffer
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+
+	for (auto it = instances.begin(); it != instances.end(); ++it) {
+		const SingleModelInstance& ins = it->second;
+		if (!ins.base_ptr->show_up)
+			continue;
+
+		texture_shader_setter(*this, ins);
+		// Draw the triangles !
+		glDrawElements(
+		    GL_TRIANGLES,      // mode
+		    indices.size(),    // count
+		    GL_UNSIGNED_SHORT, // type
+		    (void*)0           // element array buffer offset
 		);
-
-		// Index buffer
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-
-		for (auto it = instances.begin(); it != instances.end(); ++it) {
-			const SingleModelInstance& ins = it->second;
-			if (!ins.show_up)
-				continue;
-
-			texture_shader_setter(*this, ins);
-			// Draw the triangles !
-			glDrawElements(
-			    GL_TRIANGLES,      // mode
-			    indices.size(),    // count
-			    GL_UNSIGNED_SHORT, // type
-			    (void*)0           // element array buffer offset
-			);
-		}
-		glDisableVertexAttribArray(0);
 	}
-	glBindVertexArray(0);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glViewport(border[0], border[1], border[2], border[3]);
 }
 
-void SingleTextureModel::draw() {
+void SingleTextureModel::pre_draw() {
 	render_texture();
-
-	SingleModel::draw();
+	SingleModel::pre_draw();
 }
 
 void depth_map_set_up(size_t size) {

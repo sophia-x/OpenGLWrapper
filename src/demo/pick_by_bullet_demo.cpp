@@ -116,8 +116,8 @@ void pick_by_bullet_demo() {
 	for (int i = 0; i < 100; i++) {
 		vec3 pos = vec3(rand() % 20 - 10, rand() % 20 - 10, rand() % 20 - 10);
 		quat orientation = quat(vec3(rand() % 360, rand() % 360, rand() % 360));
-		model_ptr->addInstance(to_string(i), SingleModelInstance(STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME,
-		                       standard_set_up_shader, pos, orientation));
+		model_ptr->addInstance(to_string(i), SingleModelInstance(shared_ptr<Base>{new Base(pos, orientation)}, STANDARD_SHADER_NAME, TEXTURE_NAME, MATERIAL_NAME,
+		                       standard_set_up_shader));
 	}
 	world->addModel("Monkey", model_ptr);
 
@@ -137,10 +137,11 @@ void pick_by_bullet_demo() {
 	for (auto it = instances.begin(); it != instances.end(); it++) {
 		SingleModelInstance& ins = it->second;
 
-
+		const quat& origentation = ins.base_ptr->origentation;
+		const vec3& pos = ins.base_ptr->pos;
 		btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform(
-		            btQuaternion(ins.origentation.x, ins.origentation.y, ins.origentation.z, ins.origentation.w),
-		            btVector3(ins.pos.x, ins.pos.y, ins.pos.z)
+		            btQuaternion(origentation.x, origentation.y, origentation.z, origentation.w),
+		            btVector3(pos.x, pos.y, pos.z)
 		        ));
 		btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(
 		    0,                  // mass, in kg. 0 -> Static object, will never move.

@@ -30,6 +30,9 @@ public:
 	// Must called after setCurrent
 	void turnGlewOn();
 
+	// Must called after turnGlewOn()
+	void turnDebugOn(void APIENTRY(*p_DebugOutputCallback)(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar*, const void*));
+
 	inline void addWindow(const string &name, GLFWwindow* window) {
 		windows[name] = window;
 	}
@@ -95,6 +98,8 @@ private:
 	GLFWwindow* currentWindow;
 	string current_world_name;
 };
+
+void APIENTRY DebugOutputCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 
 GLFWwindow* createWindow(unsigned int width, unsigned int height, const string &title, const string &name);
 

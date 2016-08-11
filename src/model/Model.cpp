@@ -3,7 +3,7 @@
 
 #include "Model.hpp"
 
-GLuint Model::loadTexture(const string &texture_path) const {
+GLuint Model::loadTexture(const string &texture_path) {
 	static const unsigned int FOURCC_DXT1{0x31545844}; // Equivalent to "DXT1" in ASCII
 	static const unsigned int FOURCC_DXT3{0x33545844}; // Equivalent to "DXT3" in ASCII
 	static const unsigned int FOURCC_DXT5{0x35545844}; // Equivalent to "DXT5" in ASCII

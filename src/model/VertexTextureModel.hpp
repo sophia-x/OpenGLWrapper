@@ -12,14 +12,11 @@ class VertexTextureModel;
 
 struct VertexTextureInstance: public Instance {
 	VertexTextureInstance() {}
-	VertexTextureInstance(const string &p_shader_name, const string &p_texture_name, void(*p_set_up_shader)(const VertexTextureModel &,
-	                      const VertexTextureInstance &), const vec3 &p_pos = vec3(), const quat &p_orig = quat(),
-	                      const vec3 &p_size = vec3(1.0f), bool p_show_up = true): Instance{p_shader_name, 0, p_pos, p_orig, p_size, p_show_up},
-		texture_name{p_texture_name}, set_up_shader{p_set_up_shader} {}
+	VertexTextureInstance(shared_ptr<Base> p_base_ptr, const string &p_shader_name, const string &p_texture_name, void(*p_set_up_shader)(const Model &,
+	                      const Instance &)): Instance{p_base_ptr, p_shader_name, p_set_up_shader}, texture_name{p_texture_name} {}
 
 	string texture_name;
 	float life_level;
-	void(*set_up_shader)(const VertexTextureModel &, const VertexTextureInstance &);
 };
 
 class VertexTextureModel: public Model {
@@ -36,7 +33,7 @@ public:
 		glBufferData(GL_ARRAY_BUFFER, uvs.size()*sizeof(GLfloat), &uvs[0], GL_DYNAMIC_DRAW);
 	}
 
-	~VertexTextureModel() {
+	virtual ~VertexTextureModel() {
 		glDeleteVertexArrays(1, &vertex_buffer);
 		glDeleteVertexArrays(1, &uv_buffer);
 		for (auto it = textures.begin(); it != textures.end(); ++it)
@@ -63,8 +60,10 @@ public:
 		return textures.at(name);
 	}
 
-	void update(double delta);
-	void draw();
+	virtual void update(double delta);
+	virtual void pre_draw();
+	virtual void in_draw();
+	virtual void post_draw();
 
 private:
 	vector<GLfloat> vertex_data, uvs;
@@ -76,12 +75,12 @@ private:
 };
 
 void init_billboard_less_shader(World *world, const string& vertex_path, const string& freg_path, const string& name);
-void billboard_less_set_up_shader(const VertexTextureModel &model, const VertexTextureInstance &ins);
+void billboard_less_set_up_shader(const Model &model, const Instance &ins);
 
 void init_billboard_more_shader(World *world, const string& vertex_path, const string& freg_path, const string& name);
-void billboard_more_set_up_shader(const VertexTextureModel &model, const VertexTextureInstance &ins);
+void billboard_more_set_up_shader(const Model &model, const Instance &ins);
 
 void init_passthrough_shader(World *world, const string& vertex_path, const string& freg_path, const string& name);
-void passthrough_shader_set_up(const VertexTextureModel &model, const VertexTextureInstance &ins);
+void passthrough_shader_set_up(const Model &model, const Instance &ins);
 
 #endif

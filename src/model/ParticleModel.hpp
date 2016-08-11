@@ -71,8 +71,10 @@ public:
 		return shader_name;
 	}
 
-	void update(double delta);
-	void draw();
+	virtual void update(double delta);
+	virtual void pre_draw();
+	virtual void in_draw();
+	virtual void post_draw();
 
 private:
 	const size_t MAX_NUM;

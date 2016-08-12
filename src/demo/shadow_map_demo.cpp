@@ -44,7 +44,7 @@ void shadow_map_demo() {
 	PhoneMaterial *material = new PhoneMaterial(vec3(0.1f), vec3(0.3f), 5);
 	world->addMaterial(MATERIAL_NAME, material);
 
-	SingleTextureModel *model_ptr = new SingleTextureModel("models/room_thickwalls.obj", depth_map_set_up, 1024, depth_shader_set_up, DEPTH_NAME);
+	SingleTextureModel *model_ptr = new SingleTextureModel("models/room_thickwalls.obj", depth_map_set_up, vec2(1024), depth_shader_set_up, DEPTH_NAME);
 	model_ptr->addTexture(TEXTURE_NAME, "textures/room_thickwalls.DDS");
 	model_ptr->setLightName(LIGHT_NAME);
 	// model_ptr->addInstance("Room", SingleModelInstance(shared_ptr<Base>{new Base()}, SHADOW_MAP_NAME, TEXTURE_NAME, "", shadow_map_simple_set_up_shader));
@@ -77,6 +77,7 @@ void shadow_map_demo() {
 
 		manager.getCurrentController().control(delta);
 
+		model_ptr->render_texture();
 		world->update_draw(delta);
 	}
 }

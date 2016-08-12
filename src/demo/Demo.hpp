@@ -14,5 +14,6 @@ void pick_by_color_demo();
 void pick_by_bullet_demo();
 void pick_by_udf_demo();
 void standard_demo();
+void wood_demo();
 
 #endif

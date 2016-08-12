@@ -440,3 +440,26 @@ void normal_set_up_shader(const Model &r_model, const Instance &r_ins) {
 	glBindTexture(GL_TEXTURE_2D, model.getTexture(ins.specular_texture));
 	glUniform1i(shader.getUniform("SpecularTextureSampler"), 2);
 }
+
+void init_wood_shader(World *world, const string& vertex_path, const string& freg_path, const string& name) {
+	vector<string> names {
+		"rendered_texture",
+		"time"
+	};
+	world->addShader(name, new Shader(vertex_path, freg_path, names));
+}
+
+void wood_shader_set_up(const Model &r_model, const Instance &r_ins) {
+	const VertexTextureModel& model = (const VertexTextureModel&)r_model;
+	const VertexTextureInstance& ins = (const VertexTextureInstance&)r_ins;
+
+	const Shader &shader = WindowManager::getWindowManager().getCurrentWorld().getShader(ins.shader_name);
+	glUseProgram(shader.getID());
+
+	// Bind our texture in Texture Unit 0
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, model.getTexture(ins.texture_name));
+	glUniform1i(shader.getUniform("rendered_texture"), 0);
+
+	glUniform1f(shader.getUniform("time"), glfwGetTime());
+}

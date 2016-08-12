@@ -83,4 +83,7 @@ void billboard_more_set_up_shader(const Model &model, const Instance &ins);
 void init_passthrough_shader(World *world, const string& vertex_path, const string& freg_path, const string& name);
 void passthrough_shader_set_up(const Model &model, const Instance &ins);
 
+void init_wood_shader(World *world, const string& vertex_path, const string& freg_path, const string& name);
+void wood_shader_set_up(const Model &model, const Instance &ins);
+
 #endif
